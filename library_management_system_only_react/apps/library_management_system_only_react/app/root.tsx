@@ -10,6 +10,7 @@ import {
 
 import { AppNav } from './app-nav';
 import './global.css';
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 export const meta: MetaFunction = () => [
   {
@@ -41,7 +42,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <AppNav />
-        {children}
+        <GoogleOAuthProvider clientId="845326429571-afjij1ne0cd9cqauc68qdi9akkhdpord.apps.googleusercontent.com">
+          {children}
+        </GoogleOAuthProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
