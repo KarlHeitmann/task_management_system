@@ -1,8 +1,11 @@
 Rails.application.routes.draw do
   resources :books
 
-  post "/auth/:provider/callback", to: "sessions#create"
-  delete "/logout", to: "sessions#destroy"
+  # post "/auth/:provider/callback", to: "sessions#create"
+  # delete "/logout", to: "sessions#destroy"
+
+  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/failure", to: "sessions#failure"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
