@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/library_management_system_only_react-e2e"
+    },
+    {
+      "path": "./apps/library_management_system_only_react"
+    }
+  ]
+}
