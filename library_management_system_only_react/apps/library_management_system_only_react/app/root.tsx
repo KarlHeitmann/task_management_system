@@ -9,10 +9,11 @@ import {
 } from 'react-router';
 
 import { AppNav } from './app-nav';
+import './global.css';
 
 export const meta: MetaFunction = () => [
   {
-    title: 'New Nx React Router App',
+    title: 'Library Management System',
   },
 ];
 

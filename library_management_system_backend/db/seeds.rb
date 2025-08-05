@@ -8,6 +8,9 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+# Create new member
+Member.create!(email: "member@example.com", password: "password")
+
 # Create some sample books
 Book.create!(title: "1984", author: "George Orwell", genre: "Dystopian", isbn: "9780451524935", total_copies: 5)
 Book.create!(title: "The Hobbit", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)

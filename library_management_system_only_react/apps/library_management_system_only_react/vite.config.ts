@@ -1,6 +1,8 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import { reactRouter } from '@react-router/dev/vite';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -9,16 +11,29 @@ export default defineConfig(() => ({
   server: {
     port: 4200,
     host: 'localhost',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   },
   preview: {
     port: 4300,
     host: 'localhost',
   },
-  plugins: [!process.env.VITEST && reactRouter()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
+  plugins: [
+    !process.env.VITEST && reactRouter(),
+  ],
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss,
+        autoprefixer,
+      ],
+    },
+  },
   build: {
     outDir: './dist',
     emptyOutDir: true,
