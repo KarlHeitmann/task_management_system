@@ -17,7 +17,7 @@ export default function LoginComponent() {
     const data = await res.json();
 
     if (res.ok) {
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('auth_token', data.token);
       alert('Logged in!');
     } else {
       alert(data.error);
@@ -25,11 +25,11 @@ export default function LoginComponent() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
-      <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={login}>Login</button>
+    <div className="px-auto mx-4">
+      <h2 className="text-2xl font-bold">Login</h2>
+      <input className="border border-gray-300 rounded px-2 py-1" placeholder="email" onChange={(e) => setEmail(e.target.value)} />
+      <input className="border border-gray-300 rounded px-2 py-1" placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
+      <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" onClick={login}>Login</button>
     </div>
   );
 }

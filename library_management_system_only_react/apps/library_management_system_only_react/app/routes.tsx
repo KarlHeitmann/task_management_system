@@ -1,7 +1,13 @@
 import { type RouteConfig, index, route } from '@react-router/dev/routes';
 
-export default [
+const myRoutes = [
   index('./app.tsx'),
   route('login', './routes/login.tsx'),
+  route('book-detail/:id', './routes/book-detail.tsx'),
+  route('logout', './routes/logout.tsx'),
   route('help', './routes/help.tsx'),
-] satisfies RouteConfig;
+]
+
+console.log("myRoutes: ", myRoutes)
+
+export default myRoutes satisfies RouteConfig;
