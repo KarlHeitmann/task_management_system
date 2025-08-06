@@ -5,27 +5,35 @@ import { Book } from './book';
 export function List({setSelectedBook}: {setSelectedBook: (book: BookInterface) => void}) {
   const [books, setBooks] = useState<BookInterface[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/v1/books');
-        if (!response.ok) {
-          throw new Error('Failed to fetch books');
-        }
-        const data = await response.json();
-        setBooks(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching books:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchData = async (querySearch: string | null) => {
+    const url = querySearch == null ? '/api/v1/books' : `/api/v1/books?${new URLSearchParams({ q: querySearch }).toString()}`;
 
-    fetchData();
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch books');
+      }
+      const data = await response.json();
+      setBooks(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching books:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(null);
   }, []);
+
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    fetchData(e.target.value)
+  };
 
   if (isLoading) {
     return (
@@ -51,6 +59,10 @@ export function List({setSelectedBook}: {setSelectedBook: (book: BookInterface) 
     <div className="bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Book Catalog</h3>
+        <div>
+          <label htmlFor="search">Search:</label>
+          <input type="text" id="search" name="search" value={search} onChange={onSearchChange}/>
+        </div>
       </div>
       
       {books.length === 0 ? (

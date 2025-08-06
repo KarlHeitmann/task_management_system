@@ -160,6 +160,48 @@ RSpec.describe "/books", type: :request do
     describe "GET /index" do
       let(:expected_http_status) { :ok }
       include_examples "index"
+
+      context "when query string is provided" do
+
+        let!(:books) do
+          [
+            FactoryBot.create(:book, title: "Book 1"),
+            FactoryBot.create(:book, title: "Book 2 a"),
+            FactoryBot.create(:book, title: "Book 2 b"),
+            FactoryBot.create(:book, title: "Book 3"),
+            FactoryBot.create(:book, author: "Author 1"),
+            FactoryBot.create(:book, author: "Author 2"),
+            FactoryBot.create(:book, author: "Author 3"),
+            FactoryBot.create(:book, genre: "Genre 1"),
+            FactoryBot.create(:book, genre: "Genre 2"),
+            FactoryBot.create(:book, genre: "Genre 3"),
+          ]
+        end
+        context "when query string is 'book 2'" do
+          let(:params) { {q: "book 2"} }
+          it "returns books matching search criteria" do
+            get "/v1/books?#{params.to_query}", headers: valid_headers, as: :json
+            expect(response).to have_http_status(expected_http_status)
+            expect(JSON.parse(response.body).map { |b| b["title"] }).to match_array(["Book 2 a", "Book 2 b"])
+          end
+        end
+        context "when query string is 'genre'" do
+          let(:params) { {q: "genre"} }
+          it "returns books matching search criteria" do
+            get "/v1/books?#{params.to_query}", headers: valid_headers, as: :json
+            expect(response).to have_http_status(expected_http_status)
+            expect(JSON.parse(response.body).map { |b| b["genre"] }).to match_array(["Genre 1", "Genre 2", "Genre 3"])
+          end
+        end
+        context "when query string is 'author 2'" do
+          let(:params) { {q: "author 2"} }
+          it "returns books matching search criteria" do
+            get "/v1/books?#{params.to_query}", headers: valid_headers, as: :json
+            expect(response).to have_http_status(expected_http_status)
+            expect(JSON.parse(response.body).map { |b| b["author"] }).to match_array(["Author 2"])
+          end
+        end
+      end
     end
 
     describe "GET /show" do

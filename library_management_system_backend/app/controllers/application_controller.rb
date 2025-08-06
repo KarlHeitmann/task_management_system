@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::API
   def authorize_request
+    # debugger
     header = request.headers['Authorization']
     header = header.split(' ').last if header
     # debugger

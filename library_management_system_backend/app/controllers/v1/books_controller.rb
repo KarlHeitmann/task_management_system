@@ -7,8 +7,10 @@ class V1::BooksController < ApplicationController
 
   # GET /books
   def index
-    @books = Book.all
-
+    @books = Book
+               .by_title(params[:q])
+               .or(Book.by_genre(params[:q]))
+               .or(Book.by_author(params[:q]))
     render json: @books
   end
 
