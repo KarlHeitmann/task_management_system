@@ -36,43 +36,46 @@ RSpec.describe "/books", type: :request do
     }
   }
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # BooksController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) {
-    {}
+  let(:librarian) { Librarian.create!(email: "librarian@example.com", password: "password") }
+
+  let(:token) {
+    JWT.encode({ librarian_id: librarian.id }, Rails.application.credentials.secret_key_base)
   }
 
-  describe "GET /index" do
+  let(:valid_headers) {
+    { "Authorization" => "Bearer #{token}" }
+  }
+
+  shared_examples "index" do
     it "renders a successful response" do
       Book.create! valid_attributes
       get "/v1/books", headers: valid_headers, as: :json
-      expect(response).to be_successful
+      expect(response).to have_http_status(expected_http_status)
     end
   end
 
-  describe "GET /show" do
+
+  shared_examples "show" do
     it "renders a successful response" do
       book = Book.create! valid_attributes
       get "/v1/books/#{book.id}", headers: valid_headers, as: :json
-      expect(response).to be_successful
+      expect(response).to have_http_status(expected_http_status)
     end
   end
 
-  describe "POST /create" do
+  shared_examples "create" do
     context "with valid parameters" do
       it "creates a new Book" do
         expect {
           post "/v1/books",
                params: { book: valid_attributes }, headers: valid_headers, as: :json
-        }.to change(Book, :count).by(1)
+        }.to change(Book, :count).by(created_count_book)
       end
 
       it "renders a JSON response with the new book" do
         post "/v1/books",
              params: { book: valid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(http_status_valid_parameters)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
@@ -88,13 +91,13 @@ RSpec.describe "/books", type: :request do
       it "renders a JSON response with errors for the new book" do
         post "/v1/books",
              params: { book: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(http_status_invalid_parameters)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
   end
 
-  describe "PATCH /update" do
+  shared_examples "update" do
     context "with valid parameters" do
       let(:new_attributes) {
         {
@@ -110,19 +113,22 @@ RSpec.describe "/books", type: :request do
         book = Book.create! valid_attributes
         patch "/v1/books/#{book.id}",
               params: { book: new_attributes }, headers: valid_headers, as: :json
-        book.reload
-        expect(book.title).to eq("Chronicles of Narnia")
-        expect(book.author).to eq("C.S. Lewis")
-        expect(book.genre).to eq("Fantasy")
-        expect(book.isbn).to eq("9780547249650")
-        expect(book.total_copies).to eq(6)
+        expect(response).to have_http_status(http_status_valid_parameters)
+        if http_status_valid_parameters == :ok
+          book.reload
+          expect(book.title).to eq("Chronicles of Narnia")
+          expect(book.author).to eq("C.S. Lewis")
+          expect(book.genre).to eq("Fantasy")
+          expect(book.isbn).to eq("9780547249650")
+          expect(book.total_copies).to eq(6)
+        end
       end
 
       it "renders a JSON response with the book" do
         book = Book.create! valid_attributes
         patch "/v1/books/#{book.id}",
               params: { book: new_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(http_status_valid_parameters)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
@@ -132,18 +138,134 @@ RSpec.describe "/books", type: :request do
         book = Book.create! valid_attributes
         patch "/v1/books/#{book.id}",
               params: { book: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(http_status_invalid_parameters)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
   end
 
-  describe "DELETE /destroy" do
+  shared_examples "destroy" do
     it "destroys the requested book" do
       book = Book.create! valid_attributes
       expect {
         delete "/v1/books/#{book.id}", headers: valid_headers, as: :json
-      }.to change(Book, :count).by(-1)
+      }.to change(Book, :count).by(deleted_count_book)
+    end
+
+  end
+
+  context "when no one is logged in" do
+    let(:valid_headers) { {} }
+
+    describe "GET /index" do
+      let(:expected_http_status) { :ok }
+      include_examples "index"
+    end
+
+    describe "GET /show" do
+      let(:expected_http_status) { :ok }
+      include_examples "show"
+    end
+
+    describe "POST /create" do
+      let(:created_count_book) { 0 }
+      let(:http_status_valid_parameters) { :unauthorized }
+      let(:http_status_invalid_parameters) { :unauthorized }
+      include_examples "create"
+    end
+
+    describe "PATCH /update" do
+      let(:http_status_valid_parameters) { :unauthorized }
+      let(:http_status_invalid_parameters) { :unauthorized }
+      include_examples "update"
+    end
+
+    describe "DELETE /destroy" do
+      let(:deleted_count_book) { 0 }
+      let(:http_status_valid_parameters) { :unauthorized }
+      include_examples "destroy"
+    end
+  end
+
+  context "when member is logged in" do
+    let(:member) { Member.create!(email: "member@example.com", password: "password") }
+
+    let(:token) {
+      JWT.encode({ user_id: member.id, user_type: "member" }, Rails.application.credentials.secret_key_base)
+    }
+
+    let(:valid_headers) {
+      { "Authorization" => "Bearer #{token}" }
+    }
+
+    describe "GET /index" do
+      let(:expected_http_status) { :ok }
+      include_examples "index"
+    end
+
+    describe "GET /show" do
+      let(:expected_http_status) { :ok }
+      include_examples "show"
+    end
+
+    describe "POST /create" do
+      let(:created_count_book) { 0 }
+      let(:http_status_valid_parameters) { :unauthorized }
+      let(:http_status_invalid_parameters) { :unauthorized }
+      include_examples "create"
+    end
+
+    describe "PATCH /update" do
+      let(:http_status_valid_parameters) { :unauthorized }
+      let(:http_status_invalid_parameters) { :unauthorized }
+      include_examples "update"
+    end
+
+    describe "DELETE /destroy" do
+      let(:deleted_count_book) { 0 }
+      let(:http_status_valid_parameters) { :unauthorized }
+      include_examples "destroy"
+    end
+  end
+
+  context "when librarian is logged in" do
+    let(:librarian) { Librarian.create!(email: "librarian@example.com", password: "password") }
+
+    let(:token) {
+      JWT.encode({ user_id: librarian.id, user_type: "librarian" }, Rails.application.credentials.secret_key_base)
+    }
+
+    let(:valid_headers) {
+      { "Authorization" => "Bearer #{token}" }
+    }
+
+
+    describe "GET /index" do
+      let(:expected_http_status) { :ok }
+      include_examples "index"
+    end
+
+    describe "GET /show" do
+      let(:expected_http_status) { :ok }
+      include_examples "show"
+    end
+
+    describe "POST /create" do
+      let(:created_count_book) { 1 }
+      let(:http_status_valid_parameters) { :created }
+      let(:http_status_invalid_parameters) { :unprocessable_content }
+      include_examples "create"
+    end
+
+    describe "PATCH /update" do
+      let(:http_status_valid_parameters) { :ok }
+      let(:http_status_invalid_parameters) { :unprocessable_content }
+      include_examples "update"
+    end
+
+    describe "DELETE /destroy" do
+      let(:deleted_count_book) { -1 }
+      include_examples "destroy"
     end
   end
 end
