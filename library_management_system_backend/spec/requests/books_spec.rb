@@ -17,11 +17,23 @@ RSpec.describe "/books", type: :request do
   # Book. As you add validations to Book, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    {
+      title: "1984",
+      author: "George Orwell",
+      genre: "Dystopian",
+      isbn: "9780451524935",
+      total_copies: 5
+    }
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    {
+      title: nil,
+      author: "George Orwell",
+      genre: "Dystopian",
+      isbn: "9780451524935",
+      total_copies: 5
+    }
   }
 
   # This should return the minimal set of values that should be in the headers
@@ -35,7 +47,7 @@ RSpec.describe "/books", type: :request do
   describe "GET /index" do
     it "renders a successful response" do
       Book.create! valid_attributes
-      get books_url, headers: valid_headers, as: :json
+      get "/v1/books", headers: valid_headers, as: :json
       expect(response).to be_successful
     end
   end
@@ -43,7 +55,7 @@ RSpec.describe "/books", type: :request do
   describe "GET /show" do
     it "renders a successful response" do
       book = Book.create! valid_attributes
-      get book_url(book), as: :json
+      get "/v1/books/#{book.id}", headers: valid_headers, as: :json
       expect(response).to be_successful
     end
   end
@@ -52,13 +64,13 @@ RSpec.describe "/books", type: :request do
     context "with valid parameters" do
       it "creates a new Book" do
         expect {
-          post books_url,
+          post "/v1/books",
                params: { book: valid_attributes }, headers: valid_headers, as: :json
         }.to change(Book, :count).by(1)
       end
 
       it "renders a JSON response with the new book" do
-        post books_url,
+        post "/v1/books",
              params: { book: valid_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
@@ -68,15 +80,15 @@ RSpec.describe "/books", type: :request do
     context "with invalid parameters" do
       it "does not create a new Book" do
         expect {
-          post books_url,
+          post "/v1/books",
                params: { book: invalid_attributes }, as: :json
         }.to change(Book, :count).by(0)
       end
 
       it "renders a JSON response with errors for the new book" do
-        post books_url,
+        post "/v1/books",
              params: { book: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
@@ -85,20 +97,30 @@ RSpec.describe "/books", type: :request do
   describe "PATCH /update" do
     context "with valid parameters" do
       let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
+        {
+          title: "Chronicles of Narnia",
+          author: "C.S. Lewis",
+          genre: "Fantasy",
+          isbn: "9780547249650",
+          total_copies: 6
+        }
       }
 
       it "updates the requested book" do
         book = Book.create! valid_attributes
-        patch book_url(book),
+        patch "/v1/books/#{book.id}",
               params: { book: new_attributes }, headers: valid_headers, as: :json
         book.reload
-        skip("Add assertions for updated state")
+        expect(book.title).to eq("Chronicles of Narnia")
+        expect(book.author).to eq("C.S. Lewis")
+        expect(book.genre).to eq("Fantasy")
+        expect(book.isbn).to eq("9780547249650")
+        expect(book.total_copies).to eq(6)
       end
 
       it "renders a JSON response with the book" do
         book = Book.create! valid_attributes
-        patch book_url(book),
+        patch "/v1/books/#{book.id}",
               params: { book: new_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including("application/json"))
@@ -108,9 +130,9 @@ RSpec.describe "/books", type: :request do
     context "with invalid parameters" do
       it "renders a JSON response with errors for the book" do
         book = Book.create! valid_attributes
-        patch book_url(book),
+        patch "/v1/books/#{book.id}",
               params: { book: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
@@ -120,7 +142,7 @@ RSpec.describe "/books", type: :request do
     it "destroys the requested book" do
       book = Book.create! valid_attributes
       expect {
-        delete book_url(book), headers: valid_headers, as: :json
+        delete "/v1/books/#{book.id}", headers: valid_headers, as: :json
       }.to change(Book, :count).by(-1)
     end
   end

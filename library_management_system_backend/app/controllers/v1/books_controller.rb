@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# TODO: Add authorization for different users
 class V1::BooksController < ApplicationController
   before_action :set_book, only: %i[ show update destroy ]
 
