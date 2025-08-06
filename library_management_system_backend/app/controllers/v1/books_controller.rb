@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
+# TODO: Add authorization for different users
 class V1::BooksController < ApplicationController
   before_action :set_book, only: %i[ show update destroy ]
+  before_action :authorize_request, except: %i[ index show ]
 
   # GET /books
   def index
-    @books = Book.all
-
+    @books = Book
+               .by_title(params[:q])
+               .or(Book.by_genre(params[:q]))
+               .or(Book.by_author(params[:q]))
     render json: @books
   end
 
@@ -15,6 +21,8 @@ class V1::BooksController < ApplicationController
 
   # POST /books
   def create
+    return head :unauthorized unless @current_user.is_a?(Librarian)
+
     @book = Book.new(book_params)
 
     if @book.save
@@ -26,6 +34,8 @@ class V1::BooksController < ApplicationController
 
   # PATCH/PUT /books/1
   def update
+    return head :unauthorized unless @current_user.is_a?(Librarian)
+
     if @book.update(book_params)
       render json: @book
     else
@@ -35,6 +45,8 @@ class V1::BooksController < ApplicationController
 
   # DELETE /books/1
   def destroy
+    return head :unauthorized unless @current_user.is_a?(Librarian)
+
     @book.destroy!
   end
 
