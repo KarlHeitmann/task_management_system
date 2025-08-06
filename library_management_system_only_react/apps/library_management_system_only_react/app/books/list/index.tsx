@@ -1,0 +1,69 @@
+import { useEffect, useState } from 'react';
+import { Book as BookInterface } from '../../interfaces/book';
+import { Book } from './book';
+
+export function List({setSelectedBook}: {setSelectedBook: (book: BookInterface) => void}) {
+  const [books, setBooks] = useState<BookInterface[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/v1/books');
+        if (!response.ok) {
+          throw new Error('Failed to fetch books');
+        }
+        const data = await response.json();
+        setBooks(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching books:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+
+  return (
+    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Book Catalog</h3>
+      </div>
+      
+      {books.length === 0 ? (
+        <div className="p-6 text-center text-gray-500">
+          No books found in the library.
+        </div>
+      ) : (
+        <ul className="divide-y divide-gray-200">
+          {books.map((book) => (
+            <Book key={book.id} book={book} setSelectedBook={setSelectedBook}/>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
