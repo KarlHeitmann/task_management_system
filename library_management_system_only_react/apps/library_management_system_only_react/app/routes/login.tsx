@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 export default function LoginComponent() {
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState();
   const [password, setPassword] = useState('');
 
   const login = async () => {
@@ -18,15 +19,18 @@ export default function LoginComponent() {
 
     if (res.ok) {
       localStorage.setItem('auth_token', data.token);
-      alert('Logged in!');
+      localStorage.setItem('user', JSON.stringify(data.user));
+      // alert('Logged in!');
+      window.location.reload();
     } else {
-      alert(data.error);
+      setEmailError(data.error);
     }
   };
 
   return (
     <div className="px-auto mx-4">
       <h2 className="text-2xl font-bold">Login</h2>
+      {emailError && <p className="text-red-500">{emailError}</p>}
       <input className="border border-gray-300 rounded px-2 py-1" placeholder="email" onChange={(e) => setEmail(e.target.value)} />
       <input className="border border-gray-300 rounded px-2 py-1" placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
       <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" onClick={login}>Login</button>

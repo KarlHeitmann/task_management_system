@@ -9,4 +9,11 @@
   .app-nav {
     @apply hover:bg-gray-100 px-4 py-2 rounded;
   }
+
+  .btn-primary {
+    @apply bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded;
+  }
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded;
+  }
 }

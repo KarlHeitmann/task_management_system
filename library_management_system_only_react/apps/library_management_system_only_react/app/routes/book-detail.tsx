@@ -41,6 +41,8 @@ export default function BookDetail() {
         <span className="text-blue-500 hover:text-blue-600 cursor-pointer">Books</span> / {book ? book.title : id}
       </div>
       {content}
+      <button className="btn-primary mx-12">Edit</button>
+      <button className="btn-danger mx-12">Delete</button>
     </div>
   )
 }

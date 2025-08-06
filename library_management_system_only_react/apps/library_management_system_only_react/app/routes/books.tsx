@@ -49,60 +49,52 @@ export function Books() {
 
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-          My Library
-        </h1>
+    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Book Catalog</h3>
       </div>
-
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Book Catalog</h3>
+      
+      {books.length === 0 ? (
+        <div className="p-6 text-center text-gray-500">
+          No books found in the library.
         </div>
-        
-        {books.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            No books found in the library.
-          </div>
-        ) : (
-          <ul className="divide-y divide-gray-200">
-            {books.map((book) => (
-              <li key={book.id} className="cursor-pointer px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors duration-150">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0"
-                  onClick={() => navigate(`/book-detail/${book.id}`)}>
-                    <p className="text-sm font-medium text-blue-600 truncate">
-                      {book.title}
+      ) : (
+        <ul className="divide-y divide-gray-200">
+          {books.map((book) => (
+            <li key={book.id} className="cursor-pointer px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors duration-150">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0"
+                onClick={() => navigate(`/book-detail/${book.id}`)}>
+                  <p className="text-sm font-medium text-blue-600 truncate">
+                    {book.title}
+                  </p>
+                  {book.author && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      by {book.author}
                     </p>
-                    {book.author && (
-                      <p className="mt-1 text-sm text-gray-500">
-                        by {book.author}
-                      </p>
-                    )}
-                    {book.isbn && (
-                      <p className="mt-1 text-xs text-gray-400">
-                        ISBN: {book.isbn}
-                      </p>
-                    )}
-                  </div>
-                  <div className="ml-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      book.status === 'available' 
-                        ? 'bg-green-100 text-green-800' 
-                        : book.status === 'checked-out'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {book.status || 'Unknown status'}
-                    </span>
-                  </div>
+                  )}
+                  {book.isbn && (
+                    <p className="mt-1 text-xs text-gray-400">
+                      ISBN: {book.isbn}
+                    </p>
+                  )}
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                <div className="ml-4">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    book.status === 'available' 
+                      ? 'bg-green-100 text-green-800' 
+                      : book.status === 'checked-out'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {book.status || 'Unknown status'}
+                  </span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

@@ -9,7 +9,10 @@
 #   end
 
 # Create new member
-Member.create!(email: "member@example.com", password: "password")
+Member.create!(email: "member@example.com", password: "asdasd")
+
+# Create a new librarian
+Librarian.create!(email: "librarian@example.com", password: "asdasd")
 
 # Create some sample books
 Book.create!(title: "1984", author: "George Orwell", genre: "Dystopian", isbn: "9780451524935", total_copies: 5)
