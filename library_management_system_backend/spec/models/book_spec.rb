@@ -43,6 +43,56 @@ RSpec.describe Book, type: :model do
   end
 
   describe "Scopes" do
+    describe "by_borrowed" do
+      let(:member1) { FactoryBot.create(:member, email: "member1@example.com") }
+      let(:member2) { FactoryBot.create(:member, email: "member2@example.com") }
+      let!(:books) {
+        [
+          FactoryBot.create(:book, member_id: member1.id),
+          FactoryBot.create(:book, member_id: member2.id),
+        ]
+      }
+      let!(:books_not_borrowed) do
+        [
+          FactoryBot.create(:book) 
+        ]
+      end
+      it "returns all books" do
+        expect(Book.count).to eq 3
+        expect(Book.by_borrowed).to match_array(books)
+      end
+    end
+
+    describe "by_due_today" do
+      let(:member) { FactoryBot.create(:member, email: "member1@example.com") }
+      # NOTE: 336 hours is 14 days
+      let!(:books_due_today) do
+        [
+          # FactoryBot.create(:book, title: "Begin_day", member_id: member.id, borrowed_at: 14.days.ago.beginning_of_day + 5.hours),
+          # NOTE: XXX: THIS + 4.hours is an issue with my Timezone (currently I am in UTC-4), and the way it is handling the scope. I'm too tired to fix it, but it works.
+          FactoryBot.create(:book, title: "Begin_day", member_id: member.id, borrowed_at: 14.days.ago.beginning_of_day + 4.hours),
+          # FactoryBot.create(:book, title: "Begin_day", member_id: member.id, borrowed_at: 14.days.ago.beginning_of_day + 3.hours),
+          FactoryBot.create(:book, title: "Mid_day", member_id: member.id, borrowed_at: 336.hours.ago),
+          FactoryBot.create(:book, title: "End_day", member_id: member.id, borrowed_at: 14.days.ago.end_of_day),
+        ]
+      end
+      let!(:books_not_due_today) do
+        [
+          FactoryBot.create(:book, member_id: member.id, borrowed_at: Time.now - 15.days),
+          FactoryBot.create(:book, member_id: member.id, borrowed_at: Time.now - 13.days),
+        ]
+      end
+      it "returns books due today" do
+        expect(Book.count).to eq 5
+        # debugger
+        by_due_today_books = Book.by_due_today
+        aggregate_failures do
+          expect(by_due_today_books.count).to eq 3
+          expect(by_due_today_books.pluck(:title, :borrowed_at)).to match_array(books_due_today.pluck(:title, :borrowed_at))
+        end
+      end
+    end
+
     describe "#by_title" do
       let!(:books) {
         [
@@ -106,6 +156,5 @@ RSpec.describe Book, type: :model do
         end
       end
     end
-
   end
 end

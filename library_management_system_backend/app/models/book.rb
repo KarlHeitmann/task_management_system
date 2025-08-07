@@ -5,6 +5,9 @@ class Book < ApplicationRecord
   scope :by_title, ->(title) { where("title ILIKE ?", "%#{title}%") if title.present? }
   scope :by_author, ->(author) { where("author ILIKE ?", "%#{author}%") if author.present? }
   scope :by_genre, ->(genre) { where("genre ILIKE ?", "%#{genre}%") if genre.present? }
+  scope :by_borrowed, -> { where("member_id IS NOT NULL") }
+  # scope :by_due_today, -> { where("borrowed_at > ? AND borrowed_at < ?", (Time.now - 14.days).beginning_of_day, (Time.now - 14.days).end_of_day) }
+  scope :by_due_today, -> { where("borrowed_at >= ? AND borrowed_at <= ?", (Time.now - 14.days).beginning_of_day, (Time.now - 14.days).end_of_day) }
 
 
   def borrow(member_id:)

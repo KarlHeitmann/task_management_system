@@ -9,6 +9,16 @@ export default function Dashboard({mode, user, authToken}: {mode: UserType, user
   const [overdueBooks, setOverdueBooks] = useState<Book[]>([]);
   const [dueBooks, setDueBooks] = useState<Book[]>([]);
 
+  const [totalBooks, setTotalBooks] = useState<number>(0);
+  const [totalBorrowedBooks, setTotalBorrowedBooks] = useState<number>(0);
+  const [booksDueToday, setBooksDueToday] = useState<Book[]>([]);
+  const [membersWithOverdueBooks, setMembersWithOverdueBooks] = useState<User[]>([]);
+
+  // total_books: Book.count,
+  // total_borrowed_books: Book.by_borrowed.count,
+  // books_due_today: Book.by_due_today,
+  // members_with_overdue_books: Member.with_overdue_books
+
   useEffect(() => {
     const submitQuery = async () => {
       const response = await fetch('/api/v1/me', {
@@ -17,8 +27,15 @@ export default function Dashboard({mode, user, authToken}: {mode: UserType, user
         },
       });
       const data = await response.json();
-      setOverdueBooks(data.overdue_books);
-      setDueBooks(data.due_books);
+      if (mode == 'member') {
+        setOverdueBooks(data.overdue_books);
+        setDueBooks(data.due_books);
+      } else {
+        setTotalBooks(data.total_books);
+        setTotalBorrowedBooks(data.total_borrowed_books);
+        setBooksDueToday(data.books_due_today);
+        setMembersWithOverdueBooks(data.members_with_overdue_books);
+      }
     };
     submitQuery()
   }, []);
@@ -37,8 +54,10 @@ export default function Dashboard({mode, user, authToken}: {mode: UserType, user
             />
         ) : (
           <Librarian
-            user={user}
-            authToken={authToken}
+            totalBooks={totalBooks}
+            totalBorrowedBooks={totalBorrowedBooks}
+            booksDueToday={booksDueToday}
+            membersWithOverdueBooks={membersWithOverdueBooks}
             />
         )
       }

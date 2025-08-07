@@ -67,4 +67,35 @@ RSpec.describe Member, type: :model do
       end
     end
   end
+
+  describe "#with_overdue_books" do
+    let(:member) { FactoryBot.create(:member, email: "member@example.com", password: "asdasd") }
+    let(:member_with_overdue_books_1) { FactoryBot.create(:member, email: "member_with_overdue_books_1@example.com", password: "asdasd") }
+    let(:member_with_overdue_books_2) { FactoryBot.create(:member, email: "member_with_overdue_books_2@example.com", password: "asdasd") }
+    let(:member_without_overdue_books_1) { FactoryBot.create(:member, email: "member_without_overdue_books_1@example.com", password: "asdasd") }
+    let(:member_without_overdue_books_2) { FactoryBot.create(:member, email: "member_without_overdue_books_2@example.com", password: "asdasd") }
+    let!(:books_with_overdue) do
+      [
+        # FactoryBot.create(:book, member: member_with_overdue_books_1, borrowed_at: 14.days.ago.beginning_of_day + 5.hours),
+        # FactoryBot.create(:book, member: member_with_overdue_books_2, borrowed_at: 14.days.ago.beginning_of_day + 7.hours),
+        FactoryBot.create(:book, member: member_with_overdue_books_1, borrowed_at: 16.days.ago),
+        FactoryBot.create(:book, member: member_with_overdue_books_2, borrowed_at: 15.days.ago),
+      ]
+    end
+    let!(:books_without_overdue) do
+      [
+        FactoryBot.create(:book, member: member_without_overdue_books_1, borrowed_at: 7.days.ago),
+        FactoryBot.create(:book, member: member_without_overdue_books_2, borrowed_at: 13.days.ago),
+        FactoryBot.create(:book)
+      ]
+    end
+    it "gets a list of all members with overdue books" do
+      expect(Book.count).to eq 5
+      members_with_overdue = Member.with_overdue_books
+      aggregate_failures do
+        expect(members_with_overdue.count).to eq 2
+        expect(members_with_overdue.pluck(:id, :email)).to match_array([member_with_overdue_books_1, member_with_overdue_books_2].pluck(:id, :email))
+      end
+    end
+  end
 end

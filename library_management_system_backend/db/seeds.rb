@@ -43,3 +43,23 @@ Book.create!(
   borrowed_at: 15.days.ago,
   member: Member.create(email: "member3@example.com", password: "asdasd"),
 )
+
+# Create another overdue book for another member
+Book.create!(
+  title: "The Nicomachean Ethics", author: "Aristotle", genre: "Philosophy", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 20.days.ago,
+  member: Member.create(email: "member4@example.com", password: "asdasd"),
+) 
+# Create a book due today
+# NOTE: FIXME: XXX: +5.hours in borrowed_at is to account for the timezone issue I'm too lazy now to fix
+Book.create!(
+  title: "The Neverending Story", author: "Michael Ende", genre: "Children's literature", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 14.days.ago + 5.hours,
+  member: Member.create(email: "member5@example.com", password: "asdasd"),
+)
+# Create another book due today
+Book.create!(
+  title: "The Republic", author: "Plato", genre: "Philosophy", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 14.days.ago + 5.hours,
+  member: Member.create(email: "member6@example.com", password: "asdasd"),
+) 

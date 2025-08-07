@@ -28,7 +28,16 @@ class V1::AuthController < ApplicationController
         books:
       }
     else
-      render json: { email: @current_user.email, user_type: @current_user.class.name }
+      # A dashboard showing total books, total borrowed books, books due today,
+      # and a list of members with overdue books.
+      render json: {
+        email: @current_user.email,
+        user_type: @current_user.class.name,
+        total_books: Book.count,
+        total_borrowed_books: Book.by_borrowed.count,
+        books_due_today: Book.by_due_today,
+        members_with_overdue_books: Member.with_overdue_books
+      }
     end
   end
 end
