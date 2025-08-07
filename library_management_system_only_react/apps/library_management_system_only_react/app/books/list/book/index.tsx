@@ -3,6 +3,27 @@ import { Borrow } from './borrow';
 import { Return } from './return';
 import { UserType } from '../../../interfaces/user_type';
 
+function printsDate(date: string) {
+  return new Date(date).toLocaleDateString();
+}
+
+// function countDaysToDueDate(date: string, deadline_in_weeks: number) {
+function countDaysToDueDate(date: string) {
+  const initialDate = new Date(date);
+  const deadline_in_weeks = 2;
+  const dueDate = new Date(initialDate.getTime() + deadline_in_weeks * 7 * 24 * 60 * 60 * 1000);
+  const today = new Date();
+  const difference = dueDate.getTime() - today.getTime();
+  const diffTime = Math.abs(difference);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (difference < 0) {
+    return `-${diffDays}`;
+  } else {
+    return diffDays;
+
+  }
+}
+
 export function Book({book, setSelectedBook, mode, authToken}: {book: BookInterface, setSelectedBook: (book: BookInterface) => void, mode: UserType, authToken: string}) {
   // const action = "???"
   let action
@@ -11,6 +32,7 @@ export function Book({book, setSelectedBook, mode, authToken}: {book: BookInterf
   } else {
     action = <Return mode={mode} authToken={authToken} book_id={book.id}/>
   }
+  const daysLeft = countDaysToDueDate(book.borrowed_at);
   return (
     <li key={book.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors duration-150">
       <div className="flex items-center justify-between">
@@ -28,6 +50,21 @@ export function Book({book, setSelectedBook, mode, authToken}: {book: BookInterf
               ISBN: {book.isbn}
             </p>
           )}
+          {
+            book.member_id && (
+              <p className={`mt-1 text-sm text-gray-900 rounded-md px-2 py-1 ${Number(daysLeft) < 0 ? 'bg-red-100 text-red-800' : 'bg-amber-100'}`}>
+                Book was borrowed: {printsDate(book.borrowed_at)}
+                <br />
+                {
+                  Number(daysLeft) < 0 ? (
+                    <span className="text-red-800">Overdue by {daysLeft}</span>
+                  ) : (
+                    <span className="text-amber-800">Days left to return it: {daysLeft}</span>
+                  )
+                }
+              </p>
+            )
+          }
         </div>
         <div className="ml-4">
           <span className={`inline-flex items-center mx-1 px-2.5 py-0.5 rounded-full text-md font-medium ${

@@ -19,3 +19,17 @@ Book.create!(title: "1984", author: "George Orwell", genre: "Dystopian", isbn: "
 Book.create!(title: "The Hobbit", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
 Book.create!(title: "The Lord of the Rings", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
 Book.create!(title: "The Chronicles of Narnia", author: "C.S. Lewis", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
+
+# Create a book that is borrowed
+Book.create!(
+  title: "Camino de Perfección", author: "Santa Teresa de Avila", genre: "Religious", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 7.days.ago,
+  member: Member.create(email: "member2@example.com", password: "asdasd"),
+)
+
+# Create a book that is borrowed and overdue
+Book.create!(
+  title: "El libro de la sabiduría", author: "Santa Teresa de Avila", genre: "Religious", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 15.days.ago,
+  member: Member.create(email: "member3@example.com", password: "asdasd"),
+)
