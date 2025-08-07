@@ -20,4 +20,12 @@
   .btn-danger {
     @apply bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded;
   }
+
+  .btn-pill-primary {
+    @apply cursor-pointer bg-blue-500 hover:bg-blue-600 text-white inline-flex items-center mx-1 px-2.5 py-0.5 rounded-full font-medium;
+  }
+
+  .btn-pill-secondary {
+    @apply cursor-pointer bg-emerald-800 hover:bg-emerald-900 text-white inline-flex items-center mx-1 px-2.5 py-0.5 rounded-full font-medium;
+  }
 }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Book as BookInterface } from '../../interfaces/book';
 import { Book } from './book';
+import { UserType } from '../../interfaces/user_type';
 
-export function List({setSelectedBook}: {setSelectedBook: (book: BookInterface) => void}) {
+export function List({setSelectedBook, authToken, mode}: {setSelectedBook: (book: BookInterface) => void, authToken: string, mode: UserType}) {
   const [books, setBooks] = useState<BookInterface[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -61,7 +62,14 @@ export function List({setSelectedBook}: {setSelectedBook: (book: BookInterface) 
         <h3 className="text-lg leading-6 font-medium text-gray-900">Book Catalog</h3>
         <div>
           <label htmlFor="search">Search:</label>
-          <input type="text" id="search" name="search" value={search} onChange={onSearchChange}/>
+          <input
+            type="text"
+            id="search"
+            name="search"
+            value={search}
+            onChange={onSearchChange}
+            className="border border-4 border-blue-500 rounded m-1 px-2 py-1"
+          />
         </div>
       </div>
       
@@ -72,7 +80,7 @@ export function List({setSelectedBook}: {setSelectedBook: (book: BookInterface) 
       ) : (
         <ul className="divide-y divide-gray-200">
           {books.map((book) => (
-            <Book key={book.id} book={book} setSelectedBook={setSelectedBook}/>
+            <Book mode={mode} authToken={authToken} key={book.id} book={book} setSelectedBook={setSelectedBook}/>
           ))}
         </ul>
       )}

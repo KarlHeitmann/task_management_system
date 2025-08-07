@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BooksController, type: :routing do
+RSpec.describe V1::BooksController, type: :routing do
   describe "routing" do
     it "routes to #index" do
       expect(get: "/v1/books").to route_to("v1/books#index")

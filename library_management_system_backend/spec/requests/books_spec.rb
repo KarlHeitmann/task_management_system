@@ -98,7 +98,7 @@ RSpec.describe "/books", type: :request do
   end
 
   shared_examples "update" do
-    context "with valid parameters" do
+    context "with valid parameters (generic params)" do
       let(:new_attributes) {
         {
           title: "Chronicles of Narnia",
@@ -217,9 +217,42 @@ RSpec.describe "/books", type: :request do
     end
 
     describe "PATCH /update" do
-      let(:http_status_valid_parameters) { :unauthorized }
-      let(:http_status_invalid_parameters) { :unauthorized }
-      include_examples "update"
+      context "with valid parameters (generic params)" do
+        let(:new_attributes) {
+          {
+            title: "Chronicles of Narnia",
+            author: "C.S. Lewis",
+            genre: "Fantasy",
+            isbn: "9780547249650",
+            total_copies: 6
+          }
+        }
+
+        it "updates the requested book" do
+          book = Book.create! valid_attributes
+          patch "/v1/books/#{book.id}",
+                params: { book: new_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unauthorized)
+        end
+
+        it "renders a JSON response with the book" do
+          book = Book.create! valid_attributes
+          patch "/v1/books/#{book.id}",
+                params: { book: new_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.content_type).to match(a_string_including("application/json"))
+        end
+      end
+
+      context "with invalid parameters" do
+        it "renders a JSON response with errors for the book" do
+          book = Book.create! valid_attributes
+          patch "/v1/books/#{book.id}",
+                params: { book: invalid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unauthorized)
+          expect(response.content_type).to match(a_string_including("application/json"))
+        end
+      end
     end
 
     describe "DELETE /destroy" do
@@ -258,9 +291,76 @@ RSpec.describe "/books", type: :request do
     end
 
     describe "PATCH /update" do
-      let(:http_status_valid_parameters) { :unauthorized }
-      let(:http_status_invalid_parameters) { :unauthorized }
-      include_examples "update"
+      context "with valid parameters (generic params)" do
+        # let(:http_status_valid_parameters) { :unauthorized }
+        # let(:http_status_invalid_parameters) { :unauthorized }
+        # include_examples "update"
+
+        context "with valid parameters (generic params)" do
+          let(:new_attributes) {
+            {
+              title: "Chronicles of Narnia",
+              author: "C.S. Lewis",
+              genre: "Fantasy",
+              isbn: "9780547249650",
+              total_copies: 6,
+              # member_id: member.id
+            }
+          }
+          it "updates the requested book" do
+            book = Book.create! valid_attributes
+            expect(book.member_id).to be_nil
+            patch "/v1/books/#{book.id}",
+                  params: { book: new_attributes }, headers: valid_headers, as: :json
+            expect(response).to have_http_status(:ok)
+            book.reload
+            aggregate_failures do
+              # Book attributes that should remain the same
+              expect(book.title).to eq("1984")
+              expect(book.author).to eq("George Orwell")
+              expect(book.genre).to eq("Dystopian")
+              expect(book.isbn).to eq("9780451524935")
+              expect(book.total_copies).to eq(5)
+
+              # Book attributes impacted by the borrow action
+              expect(book.member_id).to eq(member.id)
+              expect(book.borrowed_at).to be_a(Time)
+            end
+          end
+        end
+
+        context "with invalid parameters" do
+          it "renders a JSON response with errors for the book" do
+            book = Book.create! valid_attributes
+            patch "/v1/books/#{book.id}",
+                  params: { book: invalid_attributes }, headers: valid_headers, as: :json
+            expect(response).to have_http_status(:ok)
+            expect(response.content_type).to match(a_string_including("application/json"))
+          end
+          it "renders a JSON response with errors for the book" do
+            book = Book.create! valid_attributes
+            expect do
+              patch "/v1/books/#{book.id}",
+                    params: { book: invalid_attributes }, headers: valid_headers, as: :json
+            end.not_to change { book.reload}
+          end
+        end
+      end # end
+      context "when valid parameters only for member are given: borrow" do
+        let(:borrow_request_params) do
+          { member_id: member.id }
+        end
+        it "updates the requested book" do
+          book = Book.create! valid_attributes
+
+          patch "/v1/books/#{book.id}",
+                params: { book: borrow_request_params }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:ok)
+          book.reload
+          expect(book.member_id).to eq(member.id)
+          expect(book.borrowed_at).to be_a(Time)
+        end
+      end
     end
 
     describe "DELETE /destroy" do
@@ -300,9 +400,71 @@ RSpec.describe "/books", type: :request do
     end
 
     describe "PATCH /update" do
-      let(:http_status_valid_parameters) { :ok }
-      let(:http_status_invalid_parameters) { :unprocessable_content }
-      include_examples "update"
+      context "with valid parameters (generic params)" do
+        let(:new_attributes) {
+          {
+            title: "Chronicles of Narnia",
+            author: "C.S. Lewis",
+            genre: "Fantasy",
+            isbn: "9780547249650",
+            total_copies: 6
+          }
+        }
+
+        it "updates the requested book" do
+          book = Book.create! valid_attributes
+          patch "/v1/books/#{book.id}",
+                params: { book: new_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:ok)
+          book.reload
+          expect(book.title).to eq("Chronicles of Narnia")
+          expect(book.author).to eq("C.S. Lewis")
+          expect(book.genre).to eq("Fantasy")
+          expect(book.isbn).to eq("9780547249650")
+          expect(book.total_copies).to eq(6)
+        end
+
+        it "renders a JSON response with the book" do
+          book = Book.create! valid_attributes
+          patch "/v1/books/#{book.id}",
+                params: { book: new_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.content_type).to match(a_string_including("application/json"))
+        end
+      end
+      context "with empty parameters" do
+        context "when book was borrowed to a member" do
+          before do
+            @member = Member.create!(email: "member@example.com", password: "password")
+            @book = Book.create! valid_attributes
+            @book.borrow(member_id: @member.id)
+          end
+          it "sets member_id to nil" do
+            expect do
+              patch "/v1/books/#{@book.id}",
+                    params: { book: {} }, headers: valid_headers, as: :json
+            end.to change { @book.reload.member_id }.from(@member.id).to(nil)
+          end
+          it "sets returned_at to the current time" do
+            expect(@book.returned_at).to be_nil
+            before_time = Time.now
+            patch "/v1/books/#{@book.id}",
+                  params: { book: {} }, headers: valid_headers, as: :json
+            after_time = Time.now
+            expect(@book.reload.returned_at).to be_between(before_time, after_time)
+          end
+        end
+      end
+
+      context "with invalid parameters" do
+        it "renders a JSON response with errors for the book" do
+          book = Book.create! valid_attributes
+          patch "/v1/books/#{book.id}",
+                params: { book: invalid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.content_type).to match(a_string_including("application/json"))
+        end
+      end
     end
 
     describe "DELETE /destroy" do
