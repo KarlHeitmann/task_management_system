@@ -15,6 +15,7 @@ export function Show({authToken, mode, book, setSelectedBook}: {authToken: strin
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
       },
       body: JSON.stringify({ book }),
     });

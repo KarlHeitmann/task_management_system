@@ -49,6 +49,7 @@ export default function Books({authToken, mode, user}: {authToken: string, mode:
         {
           newBook ? (
             <New
+              authToken={authToken}
               setNewBook={setNewBook}
               book={defaultBook}
               />
