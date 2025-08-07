@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   namespace :v1 do
     resources :books
     post 'login', to: 'auth#login'
+    get 'me', to: 'auth#me'
   end
   # resources :books
   # namespace :api do

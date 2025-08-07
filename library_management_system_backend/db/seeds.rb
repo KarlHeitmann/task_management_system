@@ -9,16 +9,26 @@
 #   end
 
 # Create new member
-Member.create!(email: "member@example.com", password: "asdasd")
+main_member = Member.create!(email: "member@example.com", password: "asdasd")
 
 # Create a new librarian
 Librarian.create!(email: "librarian@example.com", password: "asdasd")
 
 # Create some sample books
 Book.create!(title: "1984", author: "George Orwell", genre: "Dystopian", isbn: "9780451524935", total_copies: 5)
-Book.create!(title: "The Hobbit", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
-Book.create!(title: "The Lord of the Rings", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
-Book.create!(title: "The Chronicles of Narnia", author: "C.S. Lewis", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
+Book.create!(
+  title: "The Hobbit", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6,
+  member: main_member,
+  borrowed_at: 7.days.ago
+)
+Book.create!(
+  title: "The Lord of the Rings", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6,
+  member: main_member,
+  borrowed_at: 15.days.ago
+)
+Book.create!(
+  title: "The Chronicles of Narnia", author: "C.S. Lewis", genre: "Fantasy", isbn: "9780547249650", total_copies: 6
+)
 
 # Create a book that is borrowed
 Book.create!(
@@ -33,3 +43,23 @@ Book.create!(
   borrowed_at: 15.days.ago,
   member: Member.create(email: "member3@example.com", password: "asdasd"),
 )
+
+# Create another overdue book for another member
+Book.create!(
+  title: "The Nicomachean Ethics", author: "Aristotle", genre: "Philosophy", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 20.days.ago,
+  member: Member.create(email: "member4@example.com", password: "asdasd"),
+) 
+# Create a book due today
+# NOTE: FIXME: XXX: +5.hours in borrowed_at is to account for the timezone issue I'm too lazy now to fix
+Book.create!(
+  title: "The Neverending Story", author: "Michael Ende", genre: "Children's literature", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 14.days.ago + 5.hours,
+  member: Member.create(email: "member5@example.com", password: "asdasd"),
+)
+# Create another book due today
+Book.create!(
+  title: "The Republic", author: "Plato", genre: "Philosophy", isbn: "9788425216622", total_copies: 1,
+  borrowed_at: 14.days.ago + 5.hours,
+  member: Member.create(email: "member6@example.com", password: "asdasd"),
+) 
