@@ -34,9 +34,14 @@ class V1::BooksController < ApplicationController
 
   # PATCH/PUT /books/1
   def update
-    return head :unauthorized unless @current_user.is_a?(Librarian)
+    book_result = if @current_user.is_a? Librarian
+                    @book.update(book_params)
+                  else
+                    # @book.update(borrow_params.merge(borrowed_at: Time.now))
+                    @book.borrow(member_id: @current_user.id)
+                  end
 
-    if @book.update(book_params)
+    if book_result
       render json: @book
     else
       render json: @book.errors, status: :unprocessable_entity
@@ -59,5 +64,9 @@ class V1::BooksController < ApplicationController
     # Only allow a list of trusted parameters through.
     def book_params
       params.expect(book: [ :title, :author, :genre, :isbn, :total_copies ])
+    end
+
+    def borrow_params
+      params.expect(book: [ :member_id ])
     end
 end

@@ -59,7 +59,10 @@ export default function Books({authToken, mode, user}: {authToken: string, mode:
                 book={selectedBook} setSelectedBook={setSelectedBook}
                 />
             ) : (
-              <List setSelectedBook={setSelectedBook}/>
+              <List
+                authToken={authToken}
+                mode={mode}
+                setSelectedBook={setSelectedBook}/>
             )
           )
         }
