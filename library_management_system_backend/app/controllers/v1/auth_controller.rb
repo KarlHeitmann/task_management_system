@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::AuthController < ApplicationController
+  before_action :authorize_request, only: :me
   def login
     member = Member.find_by(email: params[:email])
     if member&.authenticate(params[:password])
@@ -14,6 +15,20 @@ class V1::AuthController < ApplicationController
       else
         render json: { error: 'Invalid credentials' }, status: :unauthorized
       end
+    end
+  end
+
+  def me
+    if @current_user.class.name == "Member"
+      books = @current_user.books
+      render json: {
+        email: @current_user.email, user_type: @current_user.class.name,
+        overdue_books: @current_user.overdue_books,
+        due_books: @current_user.due_books,
+        books:
+      }
+    else
+      render json: { email: @current_user.email, user_type: @current_user.class.name }
     end
   end
 end

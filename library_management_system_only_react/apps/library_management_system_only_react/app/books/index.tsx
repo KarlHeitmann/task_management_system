@@ -13,39 +13,7 @@ export default function Books({authToken, mode, user}: {authToken: string, mode:
 
   return (
     <>
-      <div className="flex justify-end">
-        {authToken && (<button
-            className="btn-danger"
-            onClick={() => {
-              localStorage.removeItem('auth_token')
-              localStorage.removeItem('user')
-              window.location.reload();
-            }}>
-            Logout
-          </button>
-          )
-        }
-      </div>
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-          My Library
-        </h1>
-        <h2>
-          Mode: {mode}
-        </h2>
-      </div>
-      <div className="flex justify-end items-center">
-        <h1 className="mr-4">
-          Welcome <span className="font-bold text-blue-500">{user?.email}</span>
-        </h1>
-        <button 
-          className={`btn-primary ${disableButtons ? 'opacity-25 cursor-not-allowed' : ''}`}
-          disabled={disableButtons}
-          onClick={() => setNewBook(true)}>
-          Add new book
-        </button>
-      </div>
-      <section className="mt-8">
+      <section className="mt-8 max-h-[calc(100vh-20rem)] overflow-y-auto">
         {
           newBook ? (
             <New
@@ -68,6 +36,14 @@ export default function Books({authToken, mode, user}: {authToken: string, mode:
           )
         }
       </section>
+      <div className="mt-8 flex justify-end items-center">
+        <button 
+          className={`btn-primary ${disableButtons ? 'opacity-25 cursor-not-allowed' : ''}`}
+          disabled={disableButtons}
+          onClick={() => setNewBook(true)}>
+          Add new book
+        </button>
+      </div>
     </>
   )
 }

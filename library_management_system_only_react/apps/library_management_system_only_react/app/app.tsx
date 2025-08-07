@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { User } from "./interfaces/user";
 import { UserType } from "./interfaces/user_type";
 import Login from "./routes/login";
-
+import Dashboard from "./dashboard";
 
 export function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +33,31 @@ export function App() {
     let content;
     if (authToken) {
       content = (
-        <Books authToken={authToken} mode={mode} user={user} />
+        <>
+          <div className="flex justify-end">
+            {authToken && (<button
+                className="btn-danger"
+                onClick={() => {
+                  localStorage.removeItem('auth_token')
+                  localStorage.removeItem('user')
+                  window.location.reload();
+                }}>
+                Logout
+              </button>
+              )
+            }
+          </div>
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+              My Library
+            </h1>
+            <h2>
+              Mode: {mode}
+            </h2>
+          </div>
+          <Dashboard mode={mode} user={user} authToken={authToken}/>
+          <Books authToken={authToken} mode={mode}/>
+        </>
       )
     } else {
       content = (

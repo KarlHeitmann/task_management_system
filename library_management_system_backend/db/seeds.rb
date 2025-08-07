@@ -9,16 +9,26 @@
 #   end
 
 # Create new member
-Member.create!(email: "member@example.com", password: "asdasd")
+main_member = Member.create!(email: "member@example.com", password: "asdasd")
 
 # Create a new librarian
 Librarian.create!(email: "librarian@example.com", password: "asdasd")
 
 # Create some sample books
 Book.create!(title: "1984", author: "George Orwell", genre: "Dystopian", isbn: "9780451524935", total_copies: 5)
-Book.create!(title: "The Hobbit", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
-Book.create!(title: "The Lord of the Rings", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
-Book.create!(title: "The Chronicles of Narnia", author: "C.S. Lewis", genre: "Fantasy", isbn: "9780547249650", total_copies: 6)
+Book.create!(
+  title: "The Hobbit", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6,
+  member: main_member,
+  borrowed_at: 7.days.ago
+)
+Book.create!(
+  title: "The Lord of the Rings", author: "J.R.R. Tolkien", genre: "Fantasy", isbn: "9780547249650", total_copies: 6,
+  member: main_member,
+  borrowed_at: 15.days.ago
+)
+Book.create!(
+  title: "The Chronicles of Narnia", author: "C.S. Lewis", genre: "Fantasy", isbn: "9780547249650", total_copies: 6
+)
 
 # Create a book that is borrowed
 Book.create!(
