@@ -9,7 +9,7 @@ export function Book({book, setSelectedBook, mode, authToken}: {book: BookInterf
   if (book.member_id == null) {
     action = <Borrow mode={mode} authToken={authToken} book_id={book.id}/>
   } else {
-    action = <Return mode={mode}/>
+    action = <Return mode={mode} authToken={authToken} book_id={book.id}/>
   }
   return (
     <li key={book.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors duration-150">

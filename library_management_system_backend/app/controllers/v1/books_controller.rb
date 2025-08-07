@@ -35,7 +35,11 @@ class V1::BooksController < ApplicationController
   # PATCH/PUT /books/1
   def update
     book_result = if @current_user.is_a? Librarian
-                    @book.update(book_params)
+                    if params[:book].empty?
+                      @book.return
+                    else
+                      @book.update(book_params)
+                    end
                   else
                     # @book.update(borrow_params.merge(borrowed_at: Time.now))
                     @book.borrow(member_id: @current_user.id)

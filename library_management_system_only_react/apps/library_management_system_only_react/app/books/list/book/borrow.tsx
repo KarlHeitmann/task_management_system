@@ -11,7 +11,8 @@ export function Borrow({mode, authToken, book_id}: {mode: UserType, authToken: s
       },
     });
     console.log(response);
-    // setNewBook(false);
+    // TODO: Refresh list of books when borrow is successful
+    window.location.reload();
   }
 
   return (

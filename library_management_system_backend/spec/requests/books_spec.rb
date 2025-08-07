@@ -432,6 +432,29 @@ RSpec.describe "/books", type: :request do
           expect(response.content_type).to match(a_string_including("application/json"))
         end
       end
+      context "with empty parameters" do
+        context "when book was borrowed to a member" do
+          before do
+            @member = Member.create!(email: "member@example.com", password: "password")
+            @book = Book.create! valid_attributes
+            @book.borrow(member_id: @member.id)
+          end
+          it "sets member_id to nil" do
+            expect do
+              patch "/v1/books/#{@book.id}",
+                    params: { book: {} }, headers: valid_headers, as: :json
+            end.to change { @book.reload.member_id }.from(@member.id).to(nil)
+          end
+          it "sets returned_at to the current time" do
+            expect(@book.returned_at).to be_nil
+            before_time = Time.now
+            patch "/v1/books/#{@book.id}",
+                  params: { book: {} }, headers: valid_headers, as: :json
+            after_time = Time.now
+            expect(@book.reload.returned_at).to be_between(before_time, after_time)
+          end
+        end
+      end
 
       context "with invalid parameters" do
         it "renders a JSON response with errors for the book" do
