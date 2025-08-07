@@ -1,3 +1,17 @@
+# PREVIEW Some Screenshots
+
+### Anonymous visitor (not logged in)
+
+<img width="1667" height="946" alt="image" src="https://github.com/user-attachments/assets/222a22c4-a468-4901-97ff-1329e1c47d9f" />
+
+### Logged in as a member (seeded data)
+
+<img width="1667" height="1105" alt="image" src="https://github.com/user-attachments/assets/20b08bce-703c-4b98-8156-4a8198fd4d68" />
+
+### Logged in as a librarian (seeded data)
+<img width="1667" height="1137" alt="image" src="https://github.com/user-attachments/assets/90500103-49ff-4769-b563-87eaddd7c28d" />
+
+
 ## Important notes:
 
 This project was built using:
