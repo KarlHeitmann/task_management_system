@@ -71,7 +71,6 @@ RSpec.describe Book, type: :model do
           # FactoryBot.create(:book, title: "Begin_day", member_id: member.id, borrowed_at: 14.days.ago.beginning_of_day + 5.hours),
           # NOTE: XXX: THIS + 4.hours is an issue with my Timezone (currently I am in UTC-4), and the way it is handling the scope. I'm too tired to fix it, but it works.
           FactoryBot.create(:book, title: "Begin_day", member_id: member.id, borrowed_at: 14.days.ago.beginning_of_day + 4.hours),
-          # FactoryBot.create(:book, title: "Begin_day", member_id: member.id, borrowed_at: 14.days.ago.beginning_of_day + 3.hours),
           FactoryBot.create(:book, title: "Mid_day", member_id: member.id, borrowed_at: 336.hours.ago),
           FactoryBot.create(:book, title: "End_day", member_id: member.id, borrowed_at: 14.days.ago.end_of_day),
         ]
@@ -84,7 +83,6 @@ RSpec.describe Book, type: :model do
       end
       it "returns books due today" do
         expect(Book.count).to eq 5
-        # debugger
         by_due_today_books = Book.by_due_today
         aggregate_failures do
           expect(by_due_today_books.count).to eq 3
