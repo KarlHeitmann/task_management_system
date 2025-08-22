@@ -4,7 +4,8 @@ class Api::V1::AuthController < ApplicationController
   def login
     member = Member.find_by(email: params[:email])
     if member&.authenticate(params[:password])
-      token = JWT.encode({ member_id: member.id }, Rails.application.secrets.secret_key_base)
+      secret = Rails.application.credentials.jwt_secret
+      token = JWT.encode({ member_id: member.id }, secret)
       render json: { token:, member: { id: member.id, email: member.email } }
     else
       render json: { error: 'Invalid credentials' }, status: :unauthorized

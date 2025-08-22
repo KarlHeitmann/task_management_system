@@ -16,6 +16,10 @@ RSpec.describe "/books", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Book. As you add validations to Book, be sure to
   # adjust the attributes here as well.
+  before do
+    # allow(Rails.application.credentials).to receive(:jwt_secret).and_return("abcdef1234567890")
+    allow(Rails.application.credentials).to receive(:jwt_secret).and_return(secret)
+  end
   let(:valid_attributes) {
     {
       title: "1984",
@@ -37,9 +41,10 @@ RSpec.describe "/books", type: :request do
   }
 
   let(:librarian) { Librarian.create!(email: "librarian@example.com", password: "password") }
+  let(:secret) { "abcdef1234567890" }
 
   let(:token) {
-    JWT.encode({ librarian_id: librarian.id }, Rails.application.credentials.secret_key_base)
+    JWT.encode({ librarian_id: librarian.id }, secret)
   }
 
   let(:valid_headers) {
@@ -266,7 +271,7 @@ RSpec.describe "/books", type: :request do
     let(:member) { Member.create!(email: "member@example.com", password: "password") }
 
     let(:token) {
-      JWT.encode({ user_id: member.id, user_type: "member" }, Rails.application.credentials.secret_key_base)
+      JWT.encode({ user_id: member.id, user_type: "member" }, secret)
     }
 
     let(:valid_headers) {
@@ -374,7 +379,7 @@ RSpec.describe "/books", type: :request do
     let(:librarian) { Librarian.create!(email: "librarian@example.com", password: "password") }
 
     let(:token) {
-      JWT.encode({ user_id: librarian.id, user_type: "librarian" }, Rails.application.credentials.secret_key_base)
+      JWT.encode({ user_id: librarian.id, user_type: "librarian" }, secret)
     }
 
     let(:valid_headers) {

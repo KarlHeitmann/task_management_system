@@ -7,8 +7,8 @@ class ApplicationController < ActionController::API
     header = header.split(' ').last if header
     # debugger
     begin
-      # decoded = JWT.decode(header, Rails.application.secrets.secret_key_base)[0]
-      decoded = JWT.decode(header, Rails.application.credentials.secret_key_base)[0]
+      secret = Rails.application.credentials.jwt_secret
+      decoded = JWT.decode(header, secret)[0]
       # @current_member = Member.find(decoded["member_id"])
       set_current_user(decoded["user_type"], decoded["user_id"])
     rescue ActiveRecord::RecordNotFound, JWT::DecodeError
