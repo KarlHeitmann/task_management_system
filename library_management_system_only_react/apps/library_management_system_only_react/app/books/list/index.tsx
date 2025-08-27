@@ -21,7 +21,6 @@ export function List({setSelectedBook, authToken, mode}: {setSelectedBook: (book
       setBooks(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error('Error fetching books:', err);
     } finally {
       setIsLoading(false);
     }

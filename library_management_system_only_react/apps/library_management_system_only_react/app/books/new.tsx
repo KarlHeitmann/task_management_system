@@ -12,7 +12,6 @@ export function New({setNewBook, book, authToken}: {setNewBook: (newBook: boolea
       },
       body: JSON.stringify({ book }),
     });
-    console.log(response);
     setNewBook(false);
   }
   return (

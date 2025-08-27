@@ -19,7 +19,6 @@ export function Show({authToken, mode, book, setSelectedBook}: {authToken: strin
       },
       body: JSON.stringify({ book }),
     });
-    console.log(response);
     setEdit(false);
     setSelectedBook(null);
   }
@@ -57,7 +56,6 @@ export function Show({authToken, mode, book, setSelectedBook}: {authToken: strin
             const response = await fetch(`/api/v1/books/${book.id}`, {
               method: 'DELETE',
             });
-            console.log(response);
             setSelectedBook(null);
           }}
           disabled={disableButtons}>

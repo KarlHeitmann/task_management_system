@@ -26,8 +26,6 @@ export function Form({book, onSubmitServer}: {book: BookForm, onSubmitServer: (b
       author,
       isbn,
     };
-
-    console.log(book)
     onSubmitServer(book);
   }
 

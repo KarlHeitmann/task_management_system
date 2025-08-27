@@ -9,10 +9,8 @@ export function Return({mode, authToken, book_id}: {mode: UserType, authToken: s
         'Authorization': `Bearer ${authToken}`,
       },
     });
-    console.log(response);
+    // TODO: Refresh list of books when borrow is successful. Don't use window.location.reload();
     window.location.reload();
-    // TODO: Refresh list of books when borrow is successful
-    // setNewBook(false);
   }
 
   return (
